@@ -1,8 +1,12 @@
+from print_tricks import pt
+
 import os
 import sys
 
-from get_clips import get_clips
+from get_clips import find_clips
 from gui import GUI
+from get_image_frames_for_cuts import get_image_frames_for_cuts
+from process_clips import process_clips
 
 def main():
     if len(sys.argv) > 1:
@@ -21,8 +25,12 @@ def main():
         series_path = os.path.join(cwd, 'mha_flattened')
         clips_path = cwd
     
-    frames = get_clips(clips_path)
-    print("Retrieved frames:", frames)
+    folders_with_clips = find_clips(clips_path)
+    # for folder in folders_with_clips:
+    #     process_clips(folder)
+    
+    frames = get_image_frames_for_cuts(folders_with_clips)
+    pt(frames)
 
 if __name__ == "__main__":
     main()
