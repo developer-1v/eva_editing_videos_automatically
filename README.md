@@ -1,3 +1,37 @@
+
+
+
+Solve: 
+
+CUTTING THE CLIP TOO EARLY:
+
+Option 1: - If we are getting the start/end image frames ourselves, then we can simply record the number of frames, and save that within the start_image title ('moviename_start_frame_132' = start frame then clip lasts 132 frames). 
+    - Howver, this isn't dynamic, and doesn't allow a user to just input their 2 images for the same result. 
+
+Option 2:
+    - When we are looking for close matches, we record all of the close matches, and then sort them
+    and choose the absolute closest match (instead of one that is "close enough" as it is
+    currently doing). 
+    - priority goes to the closest one, but if there are ties, then we pick the last one.  
+
+
+
+GET RID OF THE PREVIEW AT THE END:
+- Maybe the start of the preview has a specific image, always? 
+    - maybe the preview is always the last thing, even if there is an extra's scene (are the extra's 
+    always before the preview?)
+    
+- If start_frame also has some numbers afterwards, then this means it doesn't need an end frame, and we just to cut out those frames that it tells us to cut. 
+- We can also label is as "final cut frame" to have the same effect.
+
+
+
+
+
+
+
+
+
 - We should be able to specify if a particular cut can show up more than once. 
     (commercial transitions could happen multiple times, but an intro would only be once, so once that cut was found, we no longer have to look for it). 
 - Specify roughly when the cut should show up.

@@ -15,15 +15,17 @@ def get_image_frames_for_cuts(folders_with_clips):
             if not any(filename.endswith(ext) for ext in SUPPORTED_IMAGE_TYPES):
                 continue  # Skip unsupported file types
             
+            full_path = os.path.join(folder, filename)
+            
             if "start" in filename:
                 base_name = filename.replace("_start_frame.png", "")
-                start_images[base_name] = filename
+                start_images[base_name] = full_path
             elif "end" in filename and "ending" not in filename:
                 base_name = filename.replace("_end_frame.png", "")
-                end_images[base_name] = filename
+                end_images[base_name] = full_path
             elif "end" in filename:
                 base_name = filename.replace("_end_frame.png", "")
-                end_images[base_name] = filename
+                end_images[base_name] = full_path
     
     for base_name in start_images:
         if base_name in end_images:

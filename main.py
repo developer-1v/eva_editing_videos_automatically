@@ -7,6 +7,7 @@ from get_clips import find_clips
 from gui import GUI
 from get_image_frames_for_cuts import get_image_frames_for_cuts
 from process_clips import process_clips
+from tv_shows import cut_videos
 
 def main():
     if len(sys.argv) > 1:
@@ -29,8 +30,10 @@ def main():
     # for folder in folders_with_clips:
     #     process_clips(folder)
     
-    frames = get_image_frames_for_cuts(folders_with_clips)
-    pt(frames)
+    frames_to_cut = get_image_frames_for_cuts(folders_with_clips)
+    
+    cut_videos(series_path, frames_to_cut)
+    pt(frames_to_cut)
 
 if __name__ == "__main__":
     main()
