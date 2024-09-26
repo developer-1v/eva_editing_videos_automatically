@@ -54,6 +54,8 @@ def process_video_frames(video_path, size=(32, 32), fps=None):
     return resized_frames
 
 def cut_videos(series_path, frames_to_cut):
+    pt(frames_to_cut)
+    pt.ex()
     pt.t('cut videos')
     for root, dirs, files in os.walk(series_path):
         for file in files:
@@ -64,11 +66,15 @@ def cut_videos(series_path, frames_to_cut):
                 cut_ranges = []
                 
                 for start_img, end_img in frames_to_cut:
-                    start_frame = tqdm(find_frame_in_video(video_path, start_img, resized_frames))
-                    end_frame = tqdm(find_frame_in_video(video_path, end_img, resized_frames))
-                    if start_frame is not None and end_frame is not None:
+                    start_frame = find_frame_in_video(video_path, start_img, resized_frames)
+                    if end_img is not None:
+                        end_frame = find_frame_in_video(video_path, end_img, resized_frames)
+                    else:
+                        end_frame = None
+                    
+                    if start_frame is not None:
                         start_time = start_frame / video.fps
-                        end_time = end_frame / video.fps
+                        end_time = (end_frame / video.fps) if end_frame is not None else video.duration
                         cut_ranges.append((start_time, end_time))
                 
                 clips = []
