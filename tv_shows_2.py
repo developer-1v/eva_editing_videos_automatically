@@ -12,7 +12,7 @@ def simple_hash(image, size=(8, 8)):
     resized = cv2.resize(image, size)
     return resized.mean(axis=0).mean(axis=0)
 
-def find_frame_in_video(video_path, image_path, simplified_frames, size=(8, 8)):
+def find_simplified_frame_in_simplified_video(video_path, image_path, simplified_frames, size=(8, 8)):
     template = cv2.imread(image_path, 0)
     
     if template is None:
@@ -33,7 +33,7 @@ def find_frame_in_video(video_path, image_path, simplified_frames, size=(8, 8)):
 
     return best_frame
 
-def process_video_frames(video_path, size=(8, 8), fps=None):
+def simplify_video_frames(video_path, size=(8, 8), fps=None):
     with VideoFileClip(video_path) as video:
         simplified_frames = {}
         
@@ -47,7 +47,7 @@ def process_video_frames(video_path, size=(8, 8), fps=None):
         
         return simplified_frames
 
-def refine_match(video_path, image_path, frame_number, size=(32, 32)):
+def find_full_image_frame_in_full_video_frame(video_path, image_path, frame_number, size=(32, 32)):
     with VideoFileClip(video_path) as video:
         template = cv2.imread(image_path, 0)
         
@@ -63,27 +63,27 @@ def refine_match(video_path, image_path, frame_number, size=(32, 32)):
         score, _ = ssim(resized_frame, template_resized, full=True)
         return frame_number if score > 0.8 else None
 
-def cut_videos(series_path, frames_to_cut):
+def process_videos(series_path, frames_to_cut):
     for root, dirs, files in os.walk(series_path):
         for file in files:
             if file.endswith(('.mp4', '.avi', '.mkv')):
                 video_path = os.path.join(root, file)
                 pt.t(f'processing video frames for {file}')
-                simplified_frames = process_video_frames(video_path)
+                simplified_frames = simplify_video_frames(video_path)
                 pt.t(f'processing video frames for {file}')
                 
                 with VideoFileClip(video_path) as video:
                     cut_ranges = []
                     
                     for start_img, end_img in frames_to_cut:
-                        start_frame = find_frame_in_video(video_path, start_img, simplified_frames)
-                        if start_frame is not None:
-                            start_frame = refine_match(video_path, start_img, start_frame)
+                        simplified_start_frame = find_simplified_frame_in_simplified_video(video_path, start_img, simplified_frames)
+                        if simplified_start_frame is not None:
+                            start_frame = find_full_image_frame_in_full_video_frame(video_path, start_img, simplified_start_frame)
                         
                         if end_img is not None:
-                            end_frame = find_frame_in_video(video_path, end_img, simplified_frames)
-                            if end_frame is not None:
-                                end_frame = refine_match(video_path, end_img, end_frame)
+                            simplified_end_frame = find_simplified_frame_in_simplified_video(video_path, end_img, simplified_frames)
+                            if simplified_end_frame is not None:
+                                end_frame = find_full_image_frame_in_full_video_frame(video_path, end_img, simplified_end_frame)
                         else:
                             end_frame = None
                         
@@ -92,18 +92,21 @@ def cut_videos(series_path, frames_to_cut):
                             end_time = (end_frame / video.fps) if end_frame is not None else video.duration
                             cut_ranges.append((start_time, end_time))
                     
-                    clips = []
-                    last_end = 0
-                    for start_time, end_time in cut_ranges:
-                        if last_end < start_time:
-                            clips.append(video.subclip(last_end, start_time))
-                        last_end = end_time
-                    if last_end < video.duration:
-                        clips.append(video.subclip(last_end, video.duration))
-                    
-                    if clips:
-                        final_clip = concatenate_videoclips(clips)
-                        final_clip.write_videofile('output_' + file, codec='libx264')
+                    cut_video(video, cut_ranges, file)
+
+def cut_video(video, cut_ranges, file):
+    clips = []
+    last_end = 0
+    for start_time, end_time in cut_ranges:
+        if last_end < start_time:
+            clips.append(video.subclip(last_end, start_time))
+        last_end = end_time
+    if last_end < video.duration:
+        clips.append(video.subclip(last_end, video.duration))
+    
+    if clips:
+        final_clip = concatenate_videoclips(clips)
+        final_clip.write_videofile('output_' + file, codec='libx264')
 
 
 
@@ -118,6 +121,6 @@ if __name__ == "__main__":
     frames_to_cut = get_image_frames_for_cuts(folders_with_clips)
     pt.t('get image frames for cuts')
     pt.t('cut videos')
-    cut_videos(series_path, frames_to_cut)
+    process_videos(series_path, frames_to_cut)
     pt.t('cut videos')
     pt.t('entire app')
