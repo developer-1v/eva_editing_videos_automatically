@@ -27,6 +27,7 @@ def find_frame_in_video(video_path, image_path, resized_frames, size=(32, 32)):
 
     for frame_number, resized_frame in resized_frames.items():
         score, _ = ssim(resized_frame, template_resized, full=True)
+        # pt(score)
         
         if score > best_score:
             best_score = score
@@ -45,6 +46,7 @@ def process_video_frames(video_path, size=(32, 32), fps=None):
     total_frames = int(video.fps * video.duration)
     # Use the provided fps or default to the video's native frame rate for max speed
     frame_rate = fps if fps is not None else video.fps
+    frame_rate = 100000
     
     for frame_number, frame in enumerate(tqdm(video.iter_frames(fps=frame_rate, dtype='uint8'), total=total_frames, desc="Processing frames")):
         gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -55,7 +57,7 @@ def process_video_frames(video_path, size=(32, 32), fps=None):
 
 def cut_videos(series_path, frames_to_cut):
     pt(frames_to_cut)
-    pt.ex()
+    # pt.ex()
     pt.t('cut videos')
     for root, dirs, files in os.walk(series_path):
         for file in files:
@@ -86,8 +88,10 @@ def cut_videos(series_path, frames_to_cut):
                 if last_end < video.duration:
                     clips.append(video.subclip(last_end, video.duration))
                 
-                final_clip = concatenate_videoclips(clips)
-                final_clip.write_videofile('output_' + file, codec='libx264')
+                # Ensure all clips are concatenated correctly
+                if clips:
+                    final_clip = concatenate_videoclips(clips)
+                    final_clip.write_videofile('output_' + file, codec='libx264')
 
 if __name__ == "__main__":
     series_path = r'C:\.PythonProjects\eva_editing_videos_automatically\videos_for_testing\mha_flattened'

@@ -1,5 +1,7 @@
-
-
+SPEEDUP:
+- We convert all frames to grayscale & make them down to a small small nuber. 
+- Save that number as a dictionary key and the frame as the value (is there a more compact way of doing this?)
+- When we look at the cut frames, we look for matching 
 
 Solve: 
 
