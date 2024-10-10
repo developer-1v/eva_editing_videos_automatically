@@ -1,6 +1,11 @@
 from print_tricks import pt
-from get_image_frames_for_cuts import get_image_frames_for_cuts
-from get_clips import find_clips
+from get_user_clips import (
+    find_paths_of_all_media, 
+    find_paths_of_images, 
+    find_paths_of_clips, 
+    get_movie_clips, 
+    get_frame_paired_images_to_cut
+)
 from skimage.metrics import structural_similarity as ssim
 from tqdm import tqdm
 import cv2
@@ -115,10 +120,10 @@ if __name__ == "__main__":
     pt.t('entire app')
     series_path = r'C:\.PythonProjects\eva_editing_videos_automatically\videos_for_testing\mha_flattened'
     pt.t('folders with clips')
-    folders_with_clips = find_clips(os.getcwd())
+    folders_with_clips = find_paths_of_all_media(os.getcwd())
     pt.t('folders with clips')
     pt.t('get image frames for cuts')
-    frames_to_cut = get_image_frames_for_cuts(folders_with_clips)
+    frames_to_cut = get_frame_paired_images_to_cut(folders_with_clips)
     pt.t('get image frames for cuts')
     pt.t('cut videos')
     process_videos(series_path, frames_to_cut)

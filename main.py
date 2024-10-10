@@ -3,9 +3,8 @@ from print_tricks import pt
 import os
 import sys
 
-from get_clips import find_clips
+from get_user_clips import find_paths_of_clips, find_paths_of_images, get_frame_images_for_cuts
 from gui import GUI
-from get_image_frames_for_cuts import get_image_frames_for_cuts
 from process_clips import process_clips
 from tv_shows import cut_videos
 
@@ -26,11 +25,14 @@ def main():
         series_path = os.path.join(cwd, 'mha_flattened')
         clips_path = cwd
     
-    folders_with_clips = find_clips(clips_path)
+    folders_with_clips = find_paths_of_clips(clips_path)
+    folders_with_images = find_paths_of_images(clips_path)
+    folders_with_media_to_cut = set(folders_with_clips + folders_with_images)
+    
     # for folder in folders_with_clips:
     #     process_clips(folder)
     
-    frames_to_cut = get_image_frames_for_cuts(folders_with_clips)
+    frames_to_cut = get_frame_images_for_cuts(folders_with_media_to_cut)
     
     cut_videos(series_path, frames_to_cut)
     pt(frames_to_cut)

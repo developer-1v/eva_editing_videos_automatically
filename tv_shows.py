@@ -5,8 +5,7 @@ import cv2
 import numpy as np
 import hashlib
 
-from get_image_frames_for_cuts import get_image_frames_for_cuts
-from get_clips import find_clips
+from get_user_clips import find_paths_of_clips, find_paths_of_images, get_frame_images_for_cuts
 
 from moviepy.editor import VideoFileClip, concatenate_videoclips
 from skimage.metrics import structural_similarity as ssim
@@ -95,6 +94,8 @@ def cut_videos(series_path, frames_to_cut):
 
 if __name__ == "__main__":
     series_path = r'C:\.PythonProjects\eva_editing_videos_automatically\videos_for_testing\mha_flattened'
-    folders_with_clips = find_clips(os.getcwd())
-    frames_to_cut = get_image_frames_for_cuts(folders_with_clips)
+    folders_with_clips = find_paths_of_clips(os.getcwd())
+    folders_with_images = find_paths_of_images(os.getcwd())
+    folders_with_media_to_cut = set(folders_with_clips + folders_with_images)
+    frames_to_cut = get_frame_images_for_cuts(folders_with_media_to_cut)
     cut_videos(series_path, frames_to_cut)
