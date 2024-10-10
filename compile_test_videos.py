@@ -58,7 +58,12 @@ def determine_clip_order(clips, order="normal"):
         return random.sample(clips, len(clips))
     else:
         return clips
-    
+
+def assign_order_and_compile_video(original_video_path, clips, interval_frames, output_video_name, order="normal"):
+    ordered_clips = determine_clip_order(clips, order)
+    output_video_name += f'_{order}.mkv'
+    compile_video_with_clips(original_video_path, ordered_clips, interval_frames, output_video_name)
+
 def compile_video_with_clips(original_video_path, clips, interval_frames, output_video_name):
     # Print details of the original video
     original_video = cv2.VideoCapture(original_video_path)
@@ -127,17 +132,37 @@ def compile_video_with_clips(original_video_path, clips, interval_frames, output
 
                 clip_video.release()
 
+            # Check if the end of the original video is reached
+            if not ret:
+                break
+
+    # Ensure resources are released
     original_video.release()
     out.release()
 
 if __name__ == "__main__":
     cwd = os.getcwd()
-    original_video_path = f'{cwd}/videos_for_testing/2200_frames.mkv'
+    
+    # original_video_path = f'{cwd}/videos_for_testing/2200_frames.mkv'
+    # paths_of_clips = find_paths_of_clips(cwd)
+    # output_video_name = f'{cwd}\videos_for_testing\compiled_video2.avi'
+    
+    original_video_path = os.path.join(cwd, 'videos_for_testing', 'compiled_small_videos_for_testing', 'small_original.mkv')
+    paths_of_clips = os.path.join(cwd, 'videos_for_testing', 'compiled_small_videos_for_testing', 'small_clips')
+    output_video_name = os.path.join(cwd, 'videos_for_testing', 'compiled_small_videos_for_testing', 'small_compiled')
+
     total_frames = count_frames(original_video_path)
     pt(total_frames)
 
-    paths_of_clips = find_paths_of_clips(cwd)
-    clips = get_movie_clips(paths_of_clips)
+    
+    # Print the path to ensure it's correct
+    print(f"Path to clips: {paths_of_clips}")
+    
+    # Check if the path exists
+    if not os.path.exists(paths_of_clips):
+        print(f"Error: The path {paths_of_clips} does not exist.")
+    else:
+        clips = get_movie_clips(paths_of_clips)
     
     num_clips = len(clips)
 
@@ -146,11 +171,7 @@ if __name__ == "__main__":
     
     pt(clips, num_clips, interval_frames_between_clips)
 
-    # Determine the order of clips
-    order = "random"  # Change this to "reverse" or "normal" as needed
-    ordered_clips = determine_clip_order(clips, order)
-
-    # Step 4: Compile video with clips
-    output_video_name = f'{cwd}/videos_for_testing/compiled_video2.avi'
-    compile_video_with_clips(original_video_path, ordered_clips, interval_frames_between_clips, output_video_name)
-
+    order = "normal"
+    assign_order_and_compile_video(original_video_path, clips, interval_frames_between_clips, output_video_name, order)
+    order = "reverse"
+    assign_order_and_compile_video(original_video_path, clips, interval_frames_between_clips, output_video_name, order)

@@ -78,16 +78,21 @@ def get_frame_images_for_cuts(folders_with_clips):
     
     return frame_pairs
 
-def get_movie_clips(folders_with_clips):
-    movie_clips = []
+def get_movie_clips(folder):
+    # Print the folder path to ensure it's correct
+    print(f"Folder path in get_movie_clips: {folder}")
     
-    for folder in folders_with_clips:
-        for filename in os.listdir(folder):
-            if any(filename.endswith(ext) for ext in SUPPORTED_VIDEO_TYPES):
-                full_path = os.path.join(folder, filename)
-                movie_clips.append(full_path)
+    # Check if the folder exists before listing
+    if not os.path.exists(folder):
+        raise FileNotFoundError(f"The path {folder} does not exist.")
     
-    return movie_clips
+    clips = []
+    for filename in os.listdir(folder):
+        # Ensure the file is a video file (you might want to add more checks here)
+        if filename.endswith(('.mp4', '.mkv', '.avi')):
+            clips.append(os.path.join(folder, filename))
+    
+    return clips
 
 if __name__ == "__main__":
     clips_path = os.getcwd()
